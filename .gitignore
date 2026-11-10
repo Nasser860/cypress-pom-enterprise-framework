@@ -1,0 +1,6 @@
+node_modules/
+cypress/videos/
+cypress/screenshots/
+cypress/reports/html/
+cypress/reports/mocha/
+.DS_Store
