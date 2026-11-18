@@ -1,0 +1,41 @@
+name: Cypress E2E Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  cypress-run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Run Cypress 26-Spec Suite
+        uses: cypress-io/github-action@v6
+        with:
+          command: npm test
+        continue-on-error: true
+
+      - name: Generate Mochawesome HTML Report
+        if: always()
+        run: npx mochawesome-merge cypress/reports/mocha/*.json > cypress/reports/merged.json && npx marge cypress/reports/merged.json -f report -o cypress/reports/html
+
+      - name: Upload Test Report & Videos
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-mochawesome-report
+          path: |
+            cypress/reports/html
+            cypress/videos
+            cypress/screenshots
